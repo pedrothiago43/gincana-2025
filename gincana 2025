@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pontuação - Gincana Escolar</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #2196F3;
+            --accent: #FF9800;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --danger: #dc3545;
+            --success: #28a745;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .team-list {
+            list-style: none;
+        }
+        
+        .team-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .team-item:last-child {
+            border-bottom: none;
+        }
+        
+        .team-name {
+            font-weight: 500;
+        }
+        
+        .team-score {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #3d8b40;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+        
+        .events-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .event-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .event-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .event-points {
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .ranking {
+            counter-reset: ranking;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .ranking-item::before {
+            counter-increment: ranking;
+            content: counter(ranking);
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+        
+        .ranking-item:nth-child(1)::before {
+            background: gold;
+        }
+        
+        .ranking-item:nth-child(2)::before {
+            background: silver;
+        }
+        
+        .ranking-item:nth-child(3)::before {
+            background: #cd7f32; /* bronze */
+        }
+        
+        .ranking-team {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        
+        .ranking-score {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background: var(--dark);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            background: #f0f0f0;
+            border-radius: 4px 4px 0 0;
+            margin-right: 0.25rem;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sistema de Pontuação - Gincana Escolar</h1>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">Dashboard</div>
+            <div class="tab" data-tab="add-points">Adicionar Pontos</div>
+            <div class="tab" data-tab="events">Eventos</div>
+            <div class="tab" data-tab="ranking">Classificação</div>
+        </div>
+        
+        <div class="tab-content active" id="dashboard">
+            <h2>Visão Geral</h2>
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-header">Pontuação por Equipes</div>
+                    <ul class="team-list" id="team-scores">
+                        <!-- Será preenchido via JavaScript -->
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Adicionar Pontuação Rápida</div>
+                    <div class="form-group">
+                        <label for="quick-team">Equipe:</label>
+                        <select id="quick-team">
+                            <option value="">Selecione uma equipe</option>
+                            <option value="vermelha">Vermelha</option>
+                            <option value="azul">Azul</option>
+                            <option value="amarela">Amarela</option>
+                            <option value="verde">Verde</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quick-points">Pontos:</label>
+                        <input type="number" id="quick-points" min="1" placeholder="Quantidade de pontos">
+                    </div>
+                    <div class="form-group">
+                        <label for="quick-reason">Motivo:</label>
+                        <input type="text" id="quick-reason" placeholder="Razão da pontuação">
+                    </div>
+                    <button onclick="addQuickPoints()">Adicionar Pontos</button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Próximos Eventos</div>
+                    <div class="events-list">
+                        <div class="event-card">
+                            <div class="event-name">Corrida de Saco</div>
+                            <div class="event-points">100 pontos</div>
+                            <div>14:00 - Quadra</div>
+                        </div>
+                        <div class="event-card">
+                            <div class="event-name">Quiz Cultural</div>
+                            <div class="event-points">150 pontos</div>
+                            <div>15:30 - Auditório</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="add-points">
+            <h2>Adicionar Pontuação</h2>
+            <div class="card">
+                <div class="form-group">
+                    <label for="event">Evento/Prova:</label>
+                    <select id="event">
+                        <option value="">Selecione um evento</option>
+                        <option value="corrida">Corrida de Saco</option>
+                        <option value="quiz">Quiz Cultural</option>
+                        <option value="danca">Competição de Dança</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="team">Equipe:</label>
+                    <select id="team">
+                        <option value="">Selecione uma equipe</option>
+                        <option value="vermelha">Vermelha</option>
+                        <option value="azul">Azul</option>
+                        <option value="amarela">Amarela</option>
+                        <option value="verde">Verde</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="points">Pontos:</label>
+                    <input type="number" id="points" min="1" placeholder="Quantidade de pontos">
+                </div>
+                <div class="form-group">
+                    <label for="reason">Motivo/Detalhes:</label>
+                    <input type="text" id="reason" placeholder="Detalhes da pontuação">
+                </div>
+                <button onclick="addPoints()">Registrar Pontuação</button>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="events">
+            <h2>Eventos da Gincana</h2>
+            <div class="events-list">
+                <div class="event-card">
+                    <div class="event-name">Corrida de Saco</div>
+                    <div class="event-points">100 pontos para o vencedor</div>
+                    <div>Local: Quadra</div>
+                    <div>Horário: 14:00</div>
+                </div>
+                <div class="event-card">
+                    <div class="event-name">Quiz Cultural</div>
+                    <div class="event-points">150 pontos para o vencedor</div>
+                    <div>Local: Auditório</div>
+                    <div>Horário: 15:30</div>
+                </div>
+                <div class="event-card">
+                    <div class="event-name">Competição de Dança</div>
+                    <div class="event-points">200 pontos para o vencedor</div>
+                    <div>Local: Ginásio</div>
+                    <div>Horário: 16:45</div>
+                </div>
+                <div class="event-card">
+                    <div class="event-name">Gincana de Perguntas</div>
+                    <div class="event-points">50 pontos por resposta correta</div>
+                    <div>Local: Sala de Aula 102</div>
+                    <div>Horário: 11:00</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="ranking">
+            <h2>Classificação Geral</h2>
+            <div class="card">
+                <div class="ranking" id="ranking-list">
+                    <!-- Será preenchido via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Sistema de Pontuação para Gincana Escolar &copy; 2023</p>
+    </footer>
+
+    <script>
+        // Dados iniciais
+        let teams = {
+            "vermelha": { name: "Equipe Vermelha", score: 0 },
+            "azul": { name: "Equipe Azul", score: 0 },
+            "amarela": { name: "Equipe Amarela", score: 0 },
+            "verde": { name: "Equipe Verde", score: 0 }
+        };
+        
+        let events = [];
+        
+        // Carregar dados do localStorage se existirem
+        function loadData() {
+            const savedTeams = localStorage.getItem('gincanaTeams');
+            const savedEvents = localStorage.getItem('gincanaEvents');
+            
+            if (savedTeams) {
+                teams = JSON.parse(savedTeams);
+            }
+            
+            if (savedEvents) {
+                events = JSON.parse(savedEvents);
+            }
+            
+            updateUI();
+        }
+        
+        // Salvar dados no localStorage
+        function saveData() {
+            localStorage.setItem('gincanaTeams', JSON.stringify(teams));
+            localStorage.setItem('gincanaEvents', JSON.stringify(events));
+        }
+        
+        // Atualizar a interface do usuário
+        function updateUI() {
+            // Atualizar lista de pontuação das equipes
+            const teamScoresElement = document.getElementById('team-scores');
+            teamScoresElement.innerHTML = '';
+            
+            for (const teamId in teams) {
+                const team = teams[teamId];
+                const li = document.createElement('li');
+                li.className = 'team-item';
+                li.innerHTML = `
+                    <span class="team-name">${team.name}</span>
+                    <span class="team-score">${team.score} pontos</span>
+                `;
+                teamScoresElement.appendChild(li);
+            }
+            
+            // Atualizar ranking
+            const rankingListElement = document.getElementById('ranking-list');
+            rankingListElement.innerHTML = '';
+            
+            // Ordenar equipes por pontuação
+            const sortedTeams = Object.entries(teams)
+                .map(([id, team]) => ({ id, ...team }))
+                .sort((a, b) => b.score - a.score);
+            
+            sortedTeams.forEach(team => {
+                const div = document.createElement('div');
+                div.className = 'ranking-item';
+                div.innerHTML = `
+                    <span class="ranking-team">${team.name}</span>
+                    <span class="ranking-score">${team.score} pontos</span>
+                `;
+                rankingListElement.appendChild(div);
+            });
+        }
+        
+        // Adicionar pontos via formulário completo
+        function addPoints() {
+            const eventSelect = document.getElementById('event');
+            const teamSelect = document.getElementById('team');
+            const pointsInput = document.getElementById('points');
+            const reasonInput = document.getElementById('reason');
+            
+            const event = eventSelect.value;
+            const teamId = teamSelect.value;
+            const points = parseInt(pointsInput.value);
+            const reason = reasonInput.value;
+            
+            if (!event || !teamId || !points || !reason) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            // Adicionar pontos à equipe
+            teams[teamId].score += points;
+            
+            // Registrar o evento
+            events.push({
+                event,
+                teamId,
+                teamName: teams[teamId].name,
+                points,
+                reason,
+                timestamp: new Date().toLocaleString()
+            });
+            
+            // Salvar e atualizar
+            saveData();
+            updateUI();
+            
+            // Limpar formulário
+            eventSelect.value = '';
+            teamSelect.value = '';
+            pointsInput.value = '';
+            reasonInput.value = '';
+            
+            alert(`Pontos adicionados com sucesso para ${teams[teamId].name}!`);
+        }
+        
+        // Adicionar pontos rápidos
+        function addQuickPoints() {
+            const teamSelect = document.getElementById('quick-team');
+            const pointsInput = document.getElementById('quick-points');
+            const reasonInput = document.getElementById('quick-reason');
+            
+            const teamId = teamSelect.value;
+            const points = parseInt(pointsInput.value);
+            const reason = reasonInput.value;
+            
+            if (!teamId || !points || !reason) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            // Adicionar pontos à equipe
+            teams[teamId].score += points;
+            
+            // Registrar o evento
+            events.push({
+                event: 'Pontuação Rápida',
+                teamId,
+                teamName: teams[teamId].name,
+                points,
+                reason,
+                timestamp: new Date().toLocaleString()
+            });
+            
+            // Salvar e atualizar
+            saveData();
+            updateUI();
+            
+            // Limpar formulário
+            teamSelect.value = '';
+            pointsInput.value = '';
+            reasonInput.value = '';
+            
+            alert(`Pontos adicionados com sucesso para ${teams[teamId].name}!`);
+        }
+        
+        // Sistema de abas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remover classe active de todas as abas
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Adicionar classe active à aba clicada
+                tab.classList.add('active');
+                
+                // Mostrar o conteúdo correspondente
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+    </script>
+</body>
+</html>
